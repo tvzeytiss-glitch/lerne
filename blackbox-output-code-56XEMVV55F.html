@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Học Từ Vựng Tiếng Đức</title>
+
+<style>
+body{
+font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+background:linear-gradient(135deg,#74ebd5,#9face6);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.container{
+background:white;
+padding:2.5rem;
+border-radius:20px;
+box-shadow:0 15px 35px rgba(0,0,0,0.15);
+text-align:center;
+width:90%;
+max-width:420px;
+}
+
+h1{
+color:#333;
+font-size:1.6rem;
+margin-bottom:10px;
+}
+
+.progress{
+color:#666;
+font-size:0.9rem;
+margin-bottom:10px;
+}
+
+.progress-bar{
+width:100%;
+height:8px;
+background:#eee;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:20px;
+}
+
+.progress-fill{
+height:100%;
+width:0%;
+background:#2ecc71;
+transition:width .3s;
+}
+
+.word-vi{
+font-size:1.8rem;
+font-weight:bold;
+color:#2c3e50;
+margin:20px 0;
+}
+
+input[type="text"]{
+width:85%;
+padding:12px;
+font-size:1.2rem;
+border:2px solid #ddd;
+border-radius:10px;
+text-align:center;
+margin-bottom:15px;
+outline:none;
+}
+
+input[type="text"]:focus{
+border-color:#2ecc71;
+}
+
+.btn{
+background:#3498db;
+color:white;
+border:none;
+padding:10px 20px;
+font-size:1rem;
+border-radius:10px;
+cursor:pointer;
+margin:5px;
+}
+
+.btn-check{
+background:#2ecc71;
+}
+
+.feedback{
+margin-top:15px;
+font-weight:bold;
+min-height:24px;
+}
+
+.correct{color:#27ae60;}
+.wrong{color:#e74c3c;}
+
+.speedBox{
+margin-top:10px;
+font-size:0.9rem;
+color:#555;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📚 Ôn tập từ vựng A1.1 , Đầu 1.2</h1>
+
+<div class="progress" id="progress">Câu 1</div>
+
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="word-vi" id="viWord">Đang tải...</div>
+
+<button class="btn" onclick="speakWord()">🔊 Nghe phát âm</button>
+
+<div class="speedBox">
+Tốc độ đọc:
+<input type="range" min="0.4" max="1.2" step="0.05" value="0.7" id="speedSlider">
+<span id="speedValue">0.7</span>
+</div>
+
+<br>
+
+<input type="text" id="gerInput" placeholder="Nhập từ tiếng Đức..." autocomplete="off">
+
+<div>
+<button class="btn btn-check" onclick="checkAnswer()">Kiểm tra</button>
+</div>
+
+<div class="feedback" id="feedback"></div>
+
+</div>
+
+<script>
+
+const vocabulary=[
+
+ { vi: "quả cam", de: "die Orange" },
+            { vi: "quả kiwi", de: "die Kiwi" },
+            { vi: "quả chuối", de: "die Banane" },
+            { vi: "quả táo", de: "der Apfel" },
+            { vi: "quả lê", de: "die Birne" },
+            { vi: "quả ớt chuông", de: "die Paprika" },
+            { vi: "nấm", de: "der Pilz" },
+            { vi: "hành tây", de: "die Zwiebel" },
+            { vi: "dưa leo", de: "die Gurke" },
+            { vi: "khoai tây", de: "die Kartoffel" },
+            { vi: "cà chua", de: "die Tomate" },
+            { vi: "tỏi", de: "der Knoblauch" },
+            { vi: "cá", de: "der Fisch" },
+            { vi: "thịt", de: "das Fleisch" },
+            { vi: "phô mai", de: "die Käse" },
+            { vi: "thịt nguội", de: "der Schinken" },
+            { vi: "sữa", de: "die Milch" },
+            { vi: "bánh mì", de: "das Brot" },
+            { vi: "bột mì", de: "das Mehl" },
+            { vi: "gạo", de: "der Reis" },
+            { vi: "mì", de: "die Nudeln" },
+            { vi: "đường", de: "der Zucker" },
+            { vi: "xúc xích", de: "die Wurst" },
+			{ vi: "thức dậy", de: "Aufstehen" },
+            { vi: "đường phố", de: "die Straße" },
+            { vi: "người bán hàng", de: "der Verkäufer" },
+            { vi: "người bán hàng (nữ)", de: "die Verkäuferin" },
+            { vi: "rẻ", de: "Billig" },
+            { vi: "hóa đơn", de: "die Rechnung" },
+            { vi: "đã kết hôn", de: "Verheiratet" },
+            { vi: "đã ly hôn", de: "Geschieden" },
+            { vi: "độc thân", de: "Ledig" },
+            { vi: "bác sĩ", de: "der Arzt" },
+            { vi: "bác sĩ (nữ)", de: "die Ärztin" },
+            { vi: "người phục vụ", de: "der Kellner" },
+            { vi: "người phục vụ (nữ)", de: "die Kellnerin" },
+            { vi: "kiến trúc sư", de: "der Architekt" },
+            { vi: "kiến trúc sư (nữ)", de: "die Architektin" },
+            { vi: "thợ làm bánh", de: "der Bäcker" },
+            { vi: "thợ làm bánh (nữ)", de: "die Bäckerin" },
+            { vi: "thợ điện", de: "der Elektriker" },
+            { vi: "thợ điện (nữ)", de: "die Elektrikerin" },
+            { vi: "thợ mộc", de: "der Tischler" },
+            { vi: "thợ mộc (nữ)", de: "die Tischlerin" },
+            { vi: "màu đen", de: "Schwarz" },
+            { vi: "màu nâu", de: "Braun" },
+            { vi: "nhà báo", de: "der Journalist" },
+            { vi: "nhà báo (nữ)", de: "die Journalistin" },
+            { vi: "bút bi", de: "Kugelschreiber" },
+            { vi: "tem thư", de: "Briefmarke" },
+            { vi: "giấy tờ tùy thân", de: "der Ausweis" },
+            { vi: "lịch", de: "der Kalender" },
+            { vi: "bạn bè", de: "die Freunde" },
+            { vi: "bánh sinh nhật", de: "die Geburtstagstorte" },
+            { vi: "đi bộ", de: "Gehen" },
+            { vi: "nhìn thấy", de: "Sehen" },
+            { vi: "hiểu", de: "Verstehen" },
+            { vi: "nói", de: "Sagen" },
+            { vi: "hỏi", de: "die Frage" },
+            { vi: "chạy", de: "Laufen" },
+            { vi: "cần", de: "Brauchen" },
+            { vi: "xem ti vi", de: "Fernsehen" },
+            { vi: "đi mua sắm", de: "Einkaufen" },
+            { vi: "súp", de: "die Suppe" },
+            { vi: "muốn", de: "Möchten" },
+            { vi: "đặt hàng", de: "Bestellen" },
+            { vi: "mong muốn", de: "der Wunsch" },
+            { vi: "quán rượu", de: "die Kneipe" },
+            { vi: "sân vận động", de: "die Arena" },
+            { vi: "hành khách", de: "der Fahrgast" },
+            { vi: "cư dân", de: "der Einwohner" },
+            { vi: "cư dân (nữ)", de: "die Einwohnerin" },
+            { vi: "du khách", de: "der Tourist" },
+            { vi: "du khách (nữ)", de: "die Touristin" },
+			{ vi: "đáng nhẽ ra", de: "Eigentlich" },
+            { vi: "vậy thì", de: "Also" },
+            { vi: "đơn giản", de: "einfach" },
+            { vi: "công thức", de: "das Rezept" },
+            { vi: "đón", de: "abholen" },
+            { vi: "ngay lập tức", de: "sofort" },
+            { vi: "gửi", de: "schicken" },
+            { vi: "chuyến du lịch", de: "die Reisen" },
+            { vi: "đúng giờ", de: "pünktlich" },
+            { vi: "trung tâm", de: "das Zentrum" },
+            { vi: "hút thuốc", de: "rauchen" },
+            { vi: "lịch sự", de: "höflich" },
+            { vi: "công ty", de: "die Firma" },
+            { vi: "chú", de: "der Onkel" },
+            { vi: "cô", de: "die Tante" },
+			{ vi: "cháu", de: "der Enkel" },
+            { vi: "anh chị em", de: "das Geschwister" },
+            { vi: "kiếm tiền", de: "verdienen" },
+            { vi: "ổn", de: "in Ordnung" },
+            { vi: "bài báo", de: "der Artikel" },
+            { vi: "giới thiệu", de: "vorstellen" }
+
+];
+
+let currentIndex=0;
+let shuffledVocab=[];
+let germanVoice=null;
+let speechSpeed=0.7;
+
+const slider=document.getElementById("speedSlider");
+const speedText=document.getElementById("speedValue");
+
+slider.oninput=function(){
+speechSpeed=this.value;
+speedText.innerText=this.value;
+};
+
+function shuffleArray(array){
+for(let i=array.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+}
+return array;
+}
+
+function initGame(){
+shuffledVocab=shuffleArray([...vocabulary]);
+currentIndex=0;
+loadQuestion();
+}
+
+function loadQuestion(){
+const item=shuffledVocab[currentIndex];
+
+document.getElementById("viWord").innerText=item.vi;
+document.getElementById("gerInput").value="";
+document.getElementById("feedback").innerText="";
+
+document.getElementById("progress").innerText=
+`Câu ${currentIndex+1} / ${shuffledVocab.length}`;
+
+const percent=((currentIndex+1)/shuffledVocab.length)*100;
+document.getElementById("progressFill").style.width=percent+"%";
+}
+
+function loadVoices(){
+const voices=speechSynthesis.getVoices();
+germanVoice=voices.find(v=>v.lang.startsWith("de"))||null;
+}
+
+function speakWord(){
+const word=shuffledVocab[currentIndex].de;
+if(!word) return;
+
+speechSynthesis.cancel();
+
+const speech=new SpeechSynthesisUtterance(word);
+speech.lang="de-DE";
+
+if(germanVoice){
+speech.voice=germanVoice;
+}
+
+speech.rate=speechSpeed;
+speech.pitch=1;
+
+speechSynthesis.speak(speech);
+}
+
+function checkAnswer(){
+const input=document.getElementById("gerInput").value.trim().toLowerCase();
+const correct=shuffledVocab[currentIndex].de.toLowerCase();
+const feedback=document.getElementById("feedback");
+
+if(input===correct){
+feedback.innerText="Chính xác! 🎉";
+feedback.className="feedback correct";
+
+setTimeout(()=>{
+nextQuestion();
+},800);
+
+}else{
+feedback.innerText=`Sai rồi. Đáp án: ${correct}`;
+feedback.className="feedback wrong";
+}
+}
+
+function nextQuestion(){
+currentIndex++;
+
+if(currentIndex<shuffledVocab.length){
+loadQuestion();
+}else{
+document.querySelector(".container").innerHTML=`
+<h1>🎉 Hoàn thành</h1>
+<p>Bạn đã học xong</p>
+<button class="btn" onclick="initGame()">Học lại</button>
+`;
+}
+}
+
+document.getElementById("gerInput").addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+checkAnswer();
+}
+});
+
+speechSynthesis.onvoiceschanged=loadVoices;
+
+loadVoices();
+initGame();
+
+</script>
+
+</body>
+</html>
